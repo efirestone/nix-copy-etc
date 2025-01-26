@@ -1,9 +1,9 @@
-# nix-copy-etc
+# Nix copy-to-etc
 Automatically copy files directly from ./etc in your config repo into /etc/ in your nix install
 
 ## Summary
 
-Nix provides the [environment.etc](https://search.nixos.org/options?channel=unstable&show=environment.etc) configuration option as a way to create files in the `/etc` directory of the configured Nix install. In many cases, however, you simply want to copy over a file and don't need to configure advanced options for it. In this scenario it's simpler to have the file directly in your configuration repo and have it copied over wholesale. This is where `nix-copy-etc` comes in.
+Nix provides the [environment.etc](https://search.nixos.org/options?channel=unstable&show=environment.etc) configuration option as a way to create files in the `/etc` directory of the configured Nix install. In many cases, however, you simply want to copy over a file and don't need to configure advanced options for it. In this scenario it's simpler to have the file directly in your configuration repo and have it copied over wholesale. This is where `copy-to-etc` comes in.
 
 ## Installation and Usage
 
@@ -36,7 +36,7 @@ and then enable the module:
 services.copy-to-etc.enable = true;
 ```
 
-By default, `nix-copy-etc` will look for files in the `./etc` directory of your configuration repo, but you can configure one or more different directories instead if you want:
+By default, `copy-to-etc` will look for files in the `./etc` directory of your configuration repo, but you can configure one or more different directories instead if you want:
 
 ```
 services.copy-to-etc.sourceDirs = [ ./tests/etc1 ./tests/etc2 ];
