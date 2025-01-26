@@ -41,7 +41,7 @@ in {
       enable = mkEnableOption "Copy files directly from your config directory to /etc.";
       sourceDirs = lib.mkOption {
         type = types.listOf types.path;
-        default = [ ./etc ];
+        default = [];
         description = ''
           The directories in the configuration repo which contain files to copy into /etc.
         '';
@@ -51,5 +51,21 @@ in {
 
   config = mkIf cfg.enable {
     environment.etc = etcFiles;
+
+    system.activationScripts.print-etc-source-dirs = let
+      printableDirs = map(dir: "   ${toString dir}") sourceDirs;
+    in {
+      text = ''
+        echo "Copying /etc files from dirs:${"\n"}${builtins.concatStringsSep "\n" printableDirs}";
+      '';
+    };
+
+    system.activationScripts.print-etc-files = let
+      printableFiles = map(file: "   ${file.value.source} -> /etc/${file.name}") allFiles;
+    in {
+      text = ''
+        echo "Copying /etc files:${"\n"}${builtins.concatStringsSep "\n" printableFiles}";
+      '';
+    };
   };
 }
