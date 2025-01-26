@@ -12,7 +12,7 @@ To enable this module, add it to your flake configuration:
 ```
 {
   inputs {
-    copy-to-etc.url = "github:efirestone/nix-copy-to-etc/0.1.0";
+    copy-to-etc.url = "github:efirestone/nix-copy-to-etc/0.1.1";
     nixpkgs.url = "nixpkgs/nixos-24.11";
   };
 
@@ -36,10 +36,10 @@ and then enable the module:
 services.copy-to-etc.enable = true;
 ```
 
-By default, `copy-to-etc` will look for files in the `./etc` directory of your configuration repo, but you can configure one or more different directories instead if you want:
+You configure one or more different directories using the `sourceDirs` property. At least one directory must be specified.
 
 ```
-services.copy-to-etc.sourceDirs = [ ./tests/etc1 ./tests/etc2 ];
+services.copy-to-etc.sourceDirs = [ ./etc ./nfs/etc ];
 ```
 
 ## Caveats
