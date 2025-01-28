@@ -41,7 +41,7 @@ in {
       enable = mkEnableOption "Copy files directly from your config directory to /etc.";
       sourceDirs = lib.mkOption {
         type = types.listOf types.path;
-        default = [ ./etc ];
+        default = [];
         description = ''
           The directories in the configuration repo which contain files to copy into /etc.
         '';
@@ -50,6 +50,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    environment.etc = etcFiles;
+    environment.etc = lib.throwIf (sourceDirs == [])
+      "copy-to-etc.sourceDirs must contain at least one entry." etcFiles;
   };
 }
