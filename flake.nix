@@ -6,6 +6,7 @@
   outputs = { self, nixpkgs }:
   let
     forEachSystem = nixpkgs.lib.genAttrs [
+      "aarch64-darwin"
       "aarch64-linux"
       "x86_64-linux"
     ];

@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib ? pkgs.lib,
+  stdenv,
   ...
 }:
 
@@ -27,7 +28,23 @@ let
   # Create a list of entries for all files in all source dirs, where each entry
   # contains the local file path (value) and the path within the Nix install (name).
   allFiles = builtins.concatLists (map (sourceDir:
-    map (file: {
+    map (file: let
+      filePermissionsScript = stdenv.mkDerivation {
+        name = "file-permissions";
+        runLocal = true;
+        builder = "/bin/sh";
+        args = [ "-c" "stat -c \"%a\" ${file} > $out" ];
+        system = builtins.currentSystem;
+      };
+      # filePermissionsScript = pkgs.runCommandLocal "file-permissions" {} ''
+      #   stat -c "%a" /nix/store > $out
+      # '';
+      # mode = builtins.readFile (pkgs.runCommandLocal "file-permissions" {} ''
+      #   stat -c "%a" ${file} > $out
+      # '');
+      # ${if pkgs.stdenv.isDarwin then "stat -f %p" else "stat -c %a"} ${file} > $out
+    in {
+      mode = builtins.readFile filePermissionsScript;
       name = builtins.unsafeDiscardStringContext (builtins.substring (builtins.stringLength sourceDir + 1) (builtins.stringLength file) file); # Strip sourceDir prefix
       value = { source = file; };
     }) (collectFiles sourceDir)
@@ -59,7 +76,7 @@ in {
       "copy-to-etc.sourceDirs must contain at least one entry." etcFiles;
 
     system.activationScripts.print-etc-files = let
-      printableFiles = map(file: "   ${file.value.source} -> /etc/${file.name}") allFiles;
+      printableFiles = map(file: "   ${file.value.source} (${file.mode})-> /etc/${file.name}") allFiles;
     in mkIf cfg.verbose {
       text = ''
         echo "Copying /etc files:${"\n"}${builtins.concatStringsSep "\n" printableFiles}";
