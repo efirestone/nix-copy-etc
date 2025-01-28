@@ -39,6 +39,11 @@ in {
   options = {
     services.copy-to-etc = rec {
       enable = mkEnableOption "Copy files directly from your config directory to /etc.";
+      verbose = lib.mkOption {
+        type = types.bool;
+        default = false;
+        description = "Whether or not to print out which files are being copied over to /etc.";
+      };
       sourceDirs = lib.mkOption {
         type = types.listOf types.path;
         default = [];
@@ -52,5 +57,21 @@ in {
   config = mkIf cfg.enable {
     environment.etc = lib.throwIf (sourceDirs == [])
       "copy-to-etc.sourceDirs must contain at least one entry." etcFiles;
+
+    system.activationScripts.print-etc-files = let
+      printableFiles = map(file: "   ${file.value.source} -> /etc/${file.name}") allFiles;
+    in mkIf cfg.verbose {
+      text = ''
+        echo "Copying /etc files:${"\n"}${builtins.concatStringsSep "\n" printableFiles}";
+      '';
+    };
+
+    system.activationScripts.print-etc-source-dirs = let
+      printableDirs = map(dir: "   ${toString dir}") sourceDirs;
+    in mkIf cfg.verbose {
+      text = ''
+        echo "Copying /etc files from dirs:${"\n"}${builtins.concatStringsSep "\n" printableDirs}";
+      '';
+    };
   };
 }

@@ -42,6 +42,12 @@ You configure one or more different directories using the `sourceDirs` property.
 services.copy-to-etc.sourceDirs = [ ./etc ./nfs/etc ];
 ```
 
+If you're having issues and want to debug them, you can set the verbose option to see which source directories are configured, and which files are being found within them:
+
+```
+services.copy-to-etc.verbose = true;
+```
+
 ## Caveats
 
 ### Nix Store
